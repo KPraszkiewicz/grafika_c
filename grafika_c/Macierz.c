@@ -193,13 +193,16 @@ typ* mnozenie(typ mat[16], const typ A[16], const typ B[16])
         A[12] * B[2] + A[13] * B[6] + A[14] * B[10] + A[15] * B[14],
         A[12] * B[3] + A[13] * B[7] + A[14] * B[11] + A[15] * B[15]
     };*/
+    typ mat_tmp[16];
     for (int i = 0; i < 4; ++i)
         for (int j = 0; j < 4; ++j)
         {
-            mat[i * 4 + j] = 0;
+            mat_tmp[i * 4 + j] = 0;
             for (int k = 0; k < 4; ++k)
-                mat[i * 4 + j] += A[i * 4 + k] * B[k * 4 + j];
+                mat_tmp[i * 4 + j] += A[i * 4 + k] * B[k * 4 + j];
         }
+    for (int i = 0; i < 16; ++i)
+        mat[i] = mat_tmp[i];
     return mat;
 }
 

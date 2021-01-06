@@ -2,6 +2,14 @@
 
 typedef float typ;
 
+/*
+	0   1   2   3
+	4   5   6   7
+	8   9   10  11
+	12  13  14  15
+*/
+// wymaga transponowania !!!
+
 // generowanie macierzy
 typ* macierzJednostkowa(typ mat[16]);
 typ* macierzTranslacji(typ mat[16], const typ x, const  typ y, const  typ z);

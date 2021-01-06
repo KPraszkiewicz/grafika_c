@@ -89,72 +89,25 @@ int main(void)
     GLuint id_vao = init_vao();
     bind_vbo(id_vao, id_vbo, poz_atryb,3);
 
-    /**
-    GLfloat test[] = {
-        0.0, 0.0, 0.0,
-        0.5, 0.0, 0.0,
-        0.5, 0.5, 0.0,
-        0.0, 0.5, 0.0,
-
-        0.0, 0.5, 0.0,
-        0.5, 0.5, 0.0,
-        0.5, 1.0, 0.0,
-        0.0, 1.0, 0.0,
-
-        0.5, 0.0, 0.0,
-        1.0, 0.0, 0.0,
-        1.0, 0.5, 0.0,
-        0.5, 0.5, 0.0,
-
-        0.5, 0.5, 0.0,
-        1.0, 0.5, 0.0,
-        1.0, 1.0, 0.0,
-        0.5, 1.0, 0.0
-        
-    };
-    GLuint id_vbo = init_vbo(test, sizeof(test));
-    GLuint id_vao = init_vao();
-    bind_vbo(id_vao, id_vbo, poz_atryb, 3);
-    /**
-    GLfloat test2[] = {
-        0, -1.0, 0,
-        1, -1.0, 0,
-        1, -1.0, -1,
-        0, -1.0, -1,
-
-        0, -1.0, -1,
-        1, -1.0, -1,
-        1, -1.0, -2,
-        0, -1.0, -2,
-
-        1, -1.0, 0,
-        2, -1.0, 0,
-        2, -1.0, -1,
-        1, -1.0, -1,
-
-        1, -1.0, -1,
-        2, -1.0, -1,
-        2, -1.0, -2,
-        1, -1.0, -2
-
-    };
-    GLuint id_vbo = init_vbo(test2, sizeof(test2));
-    GLuint id_vao = init_vao();
-    bind_vbo(id_vao, id_vbo, poz_atryb, 3);
-    /**/
     glUseProgram(id_programu);
 
     float mvp[16];
-    float mT[16]; //= macierzTranslacji(-50,-2,50);
+
+    float mT[16]; 
     float mR[16]; 
     float mS[16]; 
-    float mP[16]; //= macierzProjekcji(radiany(90), 1, .1, 100);
+
+    float mkt[16];
+    float mkr[16];
+    float mP[16]; 
     //float* mP = macierzProjekcji2(-5, 5, -5, 5, 5, 160);
     
     macierzJednostkowa(mvp);
     macierzProjekcji(mP, radiany(90), 4/3, .1, 100);
+    macierzTranslacji(mT, -50, -2, 50);
     
-    float ruch = 50.f;
+
+    float ruch = 0.f;
 
 
     while (!glfwWindowShouldClose(okno))
@@ -162,8 +115,12 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT);
         ruch += 0.01f;
         macierzJednostkowa(mvp);
-        macierzTranslacji(mT, -50, -2, ruch);
-        mnozenie(mvp, mP, mT);
+        macierzTranslacji(mkt, 0, 0, ruch);
+
+        mnozenie(mvp, mvp, mP);
+        mnozenie(mvp, mvp, mkt);
+        mnozenie(mvp, mvp, mT);
+        
 
         glUniformMatrix4fv(uni_mvp, 1, GL_TRUE, mvp);
         for(int i = 0; i < TN*TN; ++i)
