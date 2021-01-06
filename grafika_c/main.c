@@ -24,7 +24,7 @@ GLFWwindow* init_gl()
     glfwSetErrorCallback(error_callback);
     if (!glfwInit())
         return 0;
-    GLFWwindow* window = glfwCreateWindow(800, 800, "My GLFW Window", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "My GLFW Window", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -53,37 +53,20 @@ int main(void)
     GLuint id_programu = LoadShadersf("vs.glsl","fs.glsl");
     GLuint poz_atryb = glGetAttribLocation(id_programu, "pozycja");
     GLint uni_mvp = glGetUniformLocation(id_programu, "MVP");
-    /*
-    GLfloat wierzcholki[] = { 0,0,0, 1,0,0, 0,1,0 };
-    GLuint id_vbo;
-    glGenBuffers(1, &id_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, id_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(wierzcholki), wierzcholki, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    GLuint poz_atryb = glGetAttribLocation(id_programu, "pozycja");
-    GLuint id_vao;
-    glGenVertexArrays(1, &id_vao);
-    glBindBuffer(GL_ARRAY_BUFFER, id_vbo);
-    glVertexAttribPointer(poz_atryb, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(poz_atryb);
-    glUseProgram(id_programu);
-
-    glClear(GL_COLOR_BUFFER_BIT);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    //glDrawArrays(GL_QUADS, 0, 4);
-    glfwSwapBuffers(okno);
-    */
-    /*
-    GLfloat teren_wys[TN+1][TN+1] = { 0 };
+    /**/
+    GLfloat teren_wys[TN+1][TN+1] = { -1 };
+    for (int i = 0; i < (TN + 1) * (TN + 1); ++i)
+    {
+        *(teren_wys[0] + i) = 0;
+    }
     GLfloat teren_siatka[TN * TN * 12];
     for (int i = 0; i < TN; ++i)
     {
         for (int j = 0; j < TN; ++j)
         {
-            teren_wys[i][j] = 0;
+            //teren_wys[i][j] = -1;
             int n = (i * TN + j) * 12;
-            teren_siatka[n] = i;
+            teren_siatka[n + 0] = i;
             teren_siatka[n + 1] = teren_wys[i][j];
             teren_siatka[n + 2] = -j;
 
@@ -104,9 +87,9 @@ int main(void)
 
     GLuint id_vbo = init_vbo(teren_siatka, sizeof(teren_siatka));
     GLuint id_vao = init_vao();
-    bind_vbo(id_vao, id_vbo, poz_atryb,4);
-    
-    */
+    bind_vbo(id_vao, id_vbo, poz_atryb,3);
+
+    /**
     GLfloat test[] = {
         0.0, 0.0, 0.0,
         0.5, 0.0, 0.0,
@@ -132,26 +115,59 @@ int main(void)
     GLuint id_vbo = init_vbo(test, sizeof(test));
     GLuint id_vao = init_vao();
     bind_vbo(id_vao, id_vbo, poz_atryb, 3);
+    /**
+    GLfloat test2[] = {
+        0, -1.0, 0,
+        1, -1.0, 0,
+        1, -1.0, -1,
+        0, -1.0, -1,
+
+        0, -1.0, -1,
+        1, -1.0, -1,
+        1, -1.0, -2,
+        0, -1.0, -2,
+
+        1, -1.0, 0,
+        2, -1.0, 0,
+        2, -1.0, -1,
+        1, -1.0, -1,
+
+        1, -1.0, -1,
+        2, -1.0, -1,
+        2, -1.0, -2,
+        1, -1.0, -2
+
+    };
+    GLuint id_vbo = init_vbo(test2, sizeof(test2));
+    GLuint id_vao = init_vao();
+    bind_vbo(id_vao, id_vbo, poz_atryb, 3);
+    /**/
     glUseProgram(id_programu);
 
-    float* mvp;
-    float* mT;
-    float* mR = macierzObrotuY(radiany(45));
-    float* mP = macierzProjekcji2(5, -5, 5, -5, 5, 160);
-    float od = -5;
+    float mvp[16];
+    float mT[16]; //= macierzTranslacji(-50,-2,50);
+    float mR[16]; 
+    float mS[16]; 
+    float mP[16]; //= macierzProjekcji(radiany(90), 1, .1, 100);
+    //float* mP = macierzProjekcji2(-5, 5, -5, 5, 5, 160);
+    
+    macierzJednostkowa(mvp);
+    macierzProjekcji(mP, radiany(90), 4/3, .1, 100);
+    
+    float ruch = 50.f;
+
+
     while (!glfwWindowShouldClose(okno))
     {
         glClear(GL_COLOR_BUFFER_BIT);
-        od -= 0.01;
-        mvp = macierzJednostkowa();
-        mT = macierzTranslacji(-0.5, -0.5, od);
-        mvp = mnozenie(mvp, mP);
-        mvp = mnozenie(mvp, mT);
+        ruch += 0.01f;
+        macierzJednostkowa(mvp);
+        macierzTranslacji(mT, -50, -2, ruch);
+        mnozenie(mvp, mP, mT);
+
         glUniformMatrix4fv(uni_mvp, 1, GL_TRUE, mvp);
-        glDrawArrays(GL_LINE_LOOP, 0, 4);
-        glDrawArrays(GL_LINE_LOOP, 4, 4);
-        glDrawArrays(GL_LINE_LOOP, 8, 4);
-        glDrawArrays(GL_LINE_LOOP, 12, 4);
+        for(int i = 0; i < TN*TN; ++i)
+            glDrawArrays(GL_LINE_LOOP, i*4, 4);
         glfwSwapBuffers(okno);
         glfwPollEvents();
     }
