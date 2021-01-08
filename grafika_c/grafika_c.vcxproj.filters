@@ -30,6 +30,9 @@
     <ClCompile Include="shader.c">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
+    <ClCompile Include="funkcje.c">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Macierz.h">
@@ -46,13 +49,19 @@
     <None Include="fs.glsl">
       <Filter>Pliki zasobów\fs</Filter>
     </None>
-    <None Include="siatka.glsl">
-      <Filter>Pliki zasobów\fs</Filter>
-    </None>
     <None Include="vs.glsl">
       <Filter>Pliki zasobów\vs</Filter>
     </None>
-    <None Include="siatka_vs.glsl">
+    <None Include="teren_vs.glsl">
+      <Filter>Pliki zasobów\vs</Filter>
+    </None>
+    <None Include="teren_fs.glsl">
+      <Filter>Pliki zasobów\fs</Filter>
+    </None>
+    <None Include="obiekt_fs.glsl">
+      <Filter>Pliki zasobów\fs</Filter>
+    </None>
+    <None Include="obiekt_vs.glsl">
       <Filter>Pliki zasobów\vs</Filter>
     </None>
   </ItemGroup>

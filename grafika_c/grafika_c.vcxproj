@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="funkcje.c" />
     <ClCompile Include="Macierz.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="shader.c" />
@@ -156,8 +157,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="fs.glsl" />
-    <None Include="siatka.glsl" />
-    <None Include="siatka_vs.glsl" />
+    <None Include="obiekt_fs.glsl" />
+    <None Include="obiekt_vs.glsl" />
+    <None Include="teren_fs.glsl" />
+    <None Include="teren_vs.glsl" />
     <None Include="vs.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

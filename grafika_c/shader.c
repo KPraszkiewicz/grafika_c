@@ -43,8 +43,12 @@ GLuint wczytaj_shader(GLuint program)
 	return program;
 }
 
-GLuint LoadShadersf(const char* vertex_file_path, const char* fragment_file_path) {
-
+GLuint LoadShadersf(const char* vertex_file_path, const char* fragment_file_path) 
+{
+	long size1,size2,i;
+	char znak;
+	GLint Result = GL_FALSE;
+	int InfoLogLength;
 	// Create the shaders
 	GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -56,44 +60,36 @@ GLuint LoadShadersf(const char* vertex_file_path, const char* fragment_file_path
 	if (plikvs)
 	{
 		fseek(plikvs, 0, SEEK_END); // seek to end of file
-		int size = ftell(plikvs) * sizeof(char); // get current file pointer
+		size1 = (ftell(plikvs)) * sizeof(char); // get current file pointer
 		fseek(plikvs, 0, SEEK_SET); // seek back to beginning of file
-		VertexShaderCode = (char*)malloc(size);
-		fread(VertexShaderCode, sizeof(char), size, plikvs);
+		rewind(plikvs);
+		VertexShaderCode = (char*)malloc(size1+1);
+		i = 0;
+		while (!feof(plikvs))
+		{
+			VertexShaderCode[i] = getc(plikvs);
+			if (VertexShaderCode[i] == '}')
+			{
+				VertexShaderCode[i + 1] = '\0';
+				break;
+			}
+			++i;
+		}
+		//VertexShaderCode[size1] = '\0';
+		//fread(VertexShaderCode, sizeof(char), size1, plikvs);
 		//printf("kod: %s\n", VertexShaderCode);
 		fclose(plikvs);
 		//-----------
+		//printf("\nkod: %s\n", VertexShaderCode);
 	}
 	else {
 		printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", vertex_file_path);
 		return 0;
 	}
-
-	// Read the Fragment Shader code from the file
-	char* FragmentShaderCode;
-	FILE* plikfs;
-	fopen_s(&plikfs, fragment_file_path, "r");
-	if (plikfs)
-	{
-		fseek(plikfs, 0, SEEK_END); // seek to end of file
-		int size = ftell(plikfs) * sizeof(char); // get current file pointer
-		fseek(plikfs, 0, SEEK_SET); // seek back to beginning of file
-		FragmentShaderCode = (char*)malloc(size);
-		fread(FragmentShaderCode, sizeof(char), size, plikfs);
-		//printf("kod: %s\n", FragmentShaderCode);
-		fclose(plikfs);
-	}
-	else {
-		printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", fragment_file_path);
-		return 0;
-	}
-	GLint Result = GL_FALSE;
-	int InfoLogLength;
-
-
+	
 	// Compile Vertex Shader
 	printf("Compiling shader : %s\n", vertex_file_path);
-	glShaderSource(VertexShaderID, 1, &(char const*)VertexShaderCode, NULL);
+	glShaderSource(VertexShaderID, 1, &VertexShaderCode, NULL);
 	glCompileShader(VertexShaderID);
 	free(VertexShaderCode);
 
@@ -107,13 +103,45 @@ GLuint LoadShadersf(const char* vertex_file_path, const char* fragment_file_path
 		free(VertexShaderErrorMessage);
 	}
 
-
+	// Read the Fragment Shader code from the file
+	char* FragmentShaderCode;
+	FILE* plikfs;
+	fopen_s(&plikfs, fragment_file_path, "r");
+	if (plikfs)
+	{
+		fseek(plikfs, 0, SEEK_END); // seek to end of file
+		size2 = (ftell(plikfs)) * sizeof(char); // get current file pointer
+		fseek(plikfs, 0, SEEK_SET); // seek back to beginning of file
+		rewind(plikfs);
+		FragmentShaderCode = (char*)malloc(size2+1);
+		i = 0;
+		while (!feof(plikfs))
+		{
+			
+			FragmentShaderCode[i] = getc(plikfs);
+			if (FragmentShaderCode[i] == '}')
+			{
+				FragmentShaderCode[i + 1] = '\0';
+				break;
+			}
+			++i;
+			//putchar(VertexShaderCode[i - 1]);
+		}
+		//fread(FragmentShaderCode, sizeof(char), size2, plikfs);
+		//FragmentShaderCode[size2] = '\0';
+		//printf("\nkod: %s\n", FragmentShaderCode);
+		fclose(plikfs);
+	}
+	else {
+		printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", fragment_file_path);
+		return 0;
+	}
 
 	// Compile Fragment Shader
 	printf("Compiling shader : %s\n", fragment_file_path);
-	glShaderSource(FragmentShaderID, 1, &(char const*)FragmentShaderCode, NULL);
+	glShaderSource(FragmentShaderID, 1, &FragmentShaderCode, NULL);
 	glCompileShader(FragmentShaderID);
-	free(FragmentShaderCode);
+	//free(FragmentShaderCode);
 
 	// Check Fragment Shader
 	glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
