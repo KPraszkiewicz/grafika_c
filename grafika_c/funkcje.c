@@ -1,4 +1,5 @@
 #include "funkcje.h"
+#include "Macierz.h"
 #include<time.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -35,6 +36,15 @@ GLuint init_vbo(GLfloat* bufor, unsigned int rozmiar)
         Pewnie odbidowanie bufora
     */
     return vbo;
+}
+
+GLuint init_ebo(unsigned int indexy[], unsigned int rozmiar)
+{
+    GLuint ebo;
+    glGenBuffers(1, &ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, rozmiar * sizeof(unsigned int), indexy, GL_STATIC_DRAW);
+    return ebo;
 }
 
 GLuint init_vao()
@@ -103,13 +113,13 @@ void inicjuj_plansze(GLfloat teren_wys[TN1][TN1], int ROZ_X, int ROZ_Z, int licz
     int i, j, r1, r2, px, pz, wys;
     for (int a = 0; a < liczba_gor; ++a)
     {
-        r1 = rand() * max_promien / RAND_MAX + 5;
-        //r2 = rand() * ((r1-5) / 2) / RAND_MAX;
-        r2 = 0;
+        r1 = rand() * max_promien / RAND_MAX;
+        r2 = rand() * ((r1-5) / 2) / RAND_MAX;
+        //r2 = 0;
         wys = rand() * max_wys / RAND_MAX;
         px = rand() * ROZ_X / RAND_MAX;
         pz = rand() * ROZ_Z / RAND_MAX;
-        printf("%d %d %d\n", r1, r2, wys);
+        //printf("%d %d %d\n", r1, r2, wys);
         gora(teren_wys, ROZ_X, ROZ_Z, px, pz, r1, r2, wys);
     }
 }
@@ -148,4 +158,167 @@ GLuint inicjuj_teksture(char nazwa[])
     fclose(ws);
     free(buf);
     return texture;
+}
+
+void inicjuj_obiekty(Obiekt obiekty[], const int N)
+{
+    obiekty[0] = generuj_domek(1, 50, 1, 50);
+    for (int i = 1; i < N; ++i)
+    {
+        float s = rand() * 2. / RAND_MAX + .5f;
+        float x = rand()%200 - 50;
+        float y = s;
+        float z =  rand() % 200 - 50;
+        obiekty[i] = generuj_kostke(s, x, y, z);
+    }
+    
+}
+
+Obiekt generuj_kostke(float skala, float pozX, float pozY, float pozZ)
+{
+    static const GLfloat k_w[] =
+    {
+        // front
+        -1.0, -1.0,  1.0,
+         1.0, -1.0,  1.0,
+         1.0,  1.0,  1.0,
+        -1.0,  1.0,  1.0,
+        // back
+        -1.0, -1.0, -1.0,
+         1.0, -1.0, -1.0,
+         1.0,  1.0, -1.0,
+        -1.0,  1.0, -1.0
+    };
+    static const GLfloat k_kolory[] = {
+        // front colors
+        1.0, 0.0, 0.0,
+        0.0, 1.0, 0.0,
+        0.0, 0.0, 1.0,
+        1.0, 1.0, 1.0,
+        // back colors
+        1.0, 0.0, 0.0,
+        0.0, 1.0, 0.0,
+        0.0, 0.0, 1.0,
+        1.0, 1.0, 1.0
+    };
+    static GLuint k_indexy[] = {
+        // front
+        0, 1, 2,
+        2, 3, 0,
+        // right
+        1, 5, 6,
+        6, 2, 1,
+        // back
+        7, 6, 5,
+        5, 4, 7,
+        // left
+        4, 0, 3,
+        3, 7, 4,
+        // bottom
+        4, 5, 1,
+        1, 0, 4,
+        // top
+        3, 2, 6,
+        6, 7, 3
+    };
+    GLuint vbo_w = init_vbo(k_w, sizeof(k_w));
+    GLuint vbo_k = init_vbo(k_kolory, sizeof(k_kolory));
+    GLuint vao = init_vao();
+    bind_vbo(vao, vbo_w, 0, 3);
+    bind_vbo(vao, vbo_k, 1, 3);
+    GLuint ebo = init_ebo(k_indexy, sizeof(k_indexy));
+
+    Obiekt kostka;
+    kostka.ebo = ebo;
+    kostka.vao = vao;
+    macierzTranslacji(kostka.mT, pozX, pozY, pozZ);
+    macierzSkali(kostka.mS, skala, skala, skala);
+    macierzJednostkowa(kostka.mR);
+
+    mnozenie(kostka.mvp, kostka.mR, kostka.mS);
+    mnozenie(kostka.mvp, kostka.mvp, kostka.mT);
+
+    return kostka;
+}
+
+Obiekt generuj_domek(float skala, float pozX, float pozY, float pozZ)
+{
+    static const GLfloat d_w[] = 
+    {
+        // front
+        -1.0, -1.0,  1.0, // 0
+         1.0, -1.0,  1.0, // 1
+         1.0,  1.0,  1.0, // 2
+        -1.0,  1.0,  1.0, // 3
+        // back
+        -1.0, -1.0, -1.0, // 4
+         1.0, -1.0, -1.0, // 5
+         1.0,  1.0, -1.0, // 6
+        -1.0,  1.0, -1.0, // 7
+        //
+         0.0,  2.0,  0.0, // 8
+    };
+    static const GLfloat d_kolory[] = 
+    {
+        // front colors
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 0.0,
+       
+        // back colors
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 0.0,
+
+        1, 1, 0,
+    };
+
+    static GLuint d_indexy[] = {
+        
+        // front
+        0, 1, 2,
+        2, 3, 0,
+        // right
+        1, 5, 6,
+        6, 2, 1,
+        // back
+        7, 6, 5,
+        5, 4, 7,
+        // left
+        4, 0, 3,
+        3, 7, 4,
+        // bottom
+        4, 5, 1,
+        1, 0, 4,
+        // top
+        //3, 2, 6,
+        //6, 7, 3,
+        //
+        
+        2, 3, 8,
+        2, 6, 8,
+        7, 3, 8,
+        7, 6, 8,
+    };
+    
+    GLuint vbo_w = init_vbo(d_w, sizeof(d_w));
+    GLuint vbo_k = init_vbo(d_kolory, sizeof(d_kolory));
+    GLuint vao = init_vao();
+    bind_vbo(vao, vbo_w, 0, 3);
+    bind_vbo(vao, vbo_k, 1, 3);
+    GLuint ebo = init_ebo(d_indexy, sizeof(d_indexy));
+
+    Obiekt domek;
+    domek.ebo = ebo;
+    domek.vao = vao;
+    macierzTranslacji(domek.mT, pozX, pozY, pozZ);
+    macierzSkali(domek.mS, skala, skala, skala);
+    macierzJednostkowa(domek.mR);
+
+    mnozenie(domek.mvp, domek.mR, domek.mS);
+    mnozenie(domek.mvp, domek.mvp, domek.mT);
+
+    return domek;
 }
