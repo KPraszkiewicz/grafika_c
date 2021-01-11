@@ -106,8 +106,8 @@ int main(void)
             teren_wys[i][j] = 0;
     }
     
-    inicjuj_plansze(teren_wys, TN1, TN1, 100, 50, 3);
-    //gora(teren_wys, TN1, TN1, 20, 20, 10, 0, 9);
+    inicjuj_plansze(teren_wys, TN1, TN1, 100, 30, 40);
+    gora(teren_wys, TN1, TN1, 20, 20, 10, 0, 9);
 
     for (int i = 0; i < TN; ++i)
     {

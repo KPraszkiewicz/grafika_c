@@ -103,7 +103,7 @@ void gora(GLfloat teren_wyso[TN1][TN1], int ROZ_X, int ROZ_Z, int px, int pz, in
             {
                 int xx = (i + px + ROZ_X) % ROZ_X;
                 int zz = (j + pz + ROZ_Z) % ROZ_Z;
-                teren_wyso[xx][zz] += MIN(wys, (r1 - 2 * sqrt(i * i + j * j) * wys / (r1 - r2)));
+                teren_wyso[xx][zz] += MIN(wys, (r1 - 2 * sqrt(i * i + j * j) * wys / (r1 - r2)))/10;
             }
 
 }
@@ -114,7 +114,7 @@ void inicjuj_plansze(GLfloat teren_wys[TN1][TN1], int ROZ_X, int ROZ_Z, int licz
     for (int a = 0; a < liczba_gor; ++a)
     {
         r1 = rand() * max_promien / RAND_MAX;
-        r2 = rand() * ((r1-5) / 2) / RAND_MAX;
+        r2 = rand() * (r1 / 2) / RAND_MAX;
         //r2 = 0;
         wys = rand() * max_wys / RAND_MAX;
         px = rand() * ROZ_X / RAND_MAX;
@@ -256,7 +256,12 @@ Obiekt generuj_domek(float skala, float pozX, float pozY, float pozZ)
          1.0,  1.0, -1.0, // 6
         -1.0,  1.0, -1.0, // 7
         //
-         0.0,  2.0,  0.0, // 8
+        -1.2,  1.0, -1.2, // 8
+         1.2,  1.0, -1.2, // 9
+         1.2,  1.0,  1.2, // 10
+        -1.2,  1.0,  1.2, // 11
+        //
+         0.0,  2.0,  0.0, // 12
     };
     static const GLfloat d_kolory[] = 
     {
@@ -273,10 +278,14 @@ Obiekt generuj_domek(float skala, float pozX, float pozY, float pozZ)
         1.0, 0.0, 0.0,
 
         1, 1, 0,
+        1, 1, 0,
+        1, 1, 0,
+        1, 1, 0,
+        1, 1, 0,
     };
 
     static GLuint d_indexy[] = {
-        
+
         // front
         0, 1, 2,
         2, 3, 0,
@@ -296,11 +305,20 @@ Obiekt generuj_domek(float skala, float pozX, float pozY, float pozZ)
         //3, 2, 6,
         //6, 7, 3,
         //
-        
-        2, 3, 8,
-        2, 6, 8,
-        7, 3, 8,
-        7, 6, 8,
+
+        2, 3, 11,
+        2, 10, 11,
+        6, 2, 10,
+        6, 10, 9,
+        6,7,9,
+        7,8,9,
+        3,7,8,
+        3,8,11,
+
+        10,11,12,
+        11,8,12,
+        8,9,12,
+        9,10,12,
     };
     
     GLuint vbo_w = init_vbo(d_w, sizeof(d_w));
