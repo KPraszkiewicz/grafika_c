@@ -53,39 +53,7 @@ GLFWwindow* init_gl()
 GLfloat teren_wys[TN1][TN1];
 GLfloat teren_siatka[TN * TN * 3*6];
 
-GLfloat siatka_uv[TN * TN * 2*6] =
-{
-    0., 0.,
-    1., 0.,
-    1., 1.,
-    1., 1.,
-    0., 1.,
-    0., 0.,
-    0., 0.,
-    1., 0.,
-    1., 1.,
-    1., 1.,
-    0., 1.,
-    0., 0.,
-};
-/*
-#define z5 0.5f
-GLfloat test[] =
-{
-    -z5, -z5, 0,
-     z5, -z5, 0,
-     z5,  z5, 0,
-     z5,  z5, 0,
-    -z5,  z5, 0,
-    -z5, -z5, 0,
-    -z5, -z5 + 1, 0,
-     z5, -z5 + 1, 0,
-     z5,  z5 + 1, 0,
-     z5,  z5 + 1, 0,
-    -z5,  z5 + 1, 0,
-    -z5, -z5 + 1, 0,
-};
-*/
+GLfloat siatka_uv[TN * TN * 2*6];
 
 Obiekt obiekty[30];
 
@@ -122,7 +90,6 @@ int main(void)
             siatka_uv[k + 0] = 0;
             siatka_uv[k + 1] = 0;
 
-
             teren_siatka[n + 3] = i + 1;
             teren_siatka[n + 4] = teren_wys[i + 1][j];
             teren_siatka[n + 5] = (j);
@@ -155,9 +122,7 @@ int main(void)
         }
     }
     
-    //glUseProgram(id_programu);
     GLuint id_vbo = init_vbo(teren_siatka, sizeof(teren_siatka));
-    //GLuint id_vbo = init_vbo(test, sizeof(test));
     GLuint uv_vbo = init_vbo(siatka_uv, sizeof(siatka_uv));
     GLuint id_vao = init_vao();
     bind_vbo(id_vao, id_vbo, 0, 3);
@@ -272,7 +237,7 @@ int main(void)
         {
             Obiekt* o = obiekty + i;
             glBindVertexArray(o->vao);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, o->ebo);
+            //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, o->ebo);
             
 
            
@@ -283,8 +248,6 @@ int main(void)
             int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
             glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, 0);
         }
-        
-        //glDrawArrays(GL_TRIANGLES, 0, 2 * 6 * 3);
         
         // ==========================
         glfwSwapBuffers(okno);
